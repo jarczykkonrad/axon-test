@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  axon-server:
+    image: axoniq/axonserver
+    container_name: axon-server
+    ports:
+      - "8124:8124"
+      - "8024:8024" # UI port
+    volumes:
+      - axon-data:/data
+      - axon-events:/eventdata
+    environment:
+      - AXONIQ_AXONSERVER_DEVMODE=true
+
+  spring-app:
+    build:
+      context: .
+    container_name: spring-app
+    ports:
+      - "8080:8080"
+    depends_on:
+      - axon-server
+    environment:
+      SPRING_APPLICATION_NAME: testAxon
+      AXON_AXONSERVER_SERVERS: axon-server:8124
+      AXON_AXONSERVER_CONTEXT: default
+
+volumes:
+  axon-data:
+  axon-events:
